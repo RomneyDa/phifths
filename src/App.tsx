@@ -163,71 +163,69 @@ export default function App() {
       </header>
 
       <main className="main">
-        <div className="mode-toggle" role="radiogroup" aria-label="Layout mode">
-          <button
-            role="radio"
-            aria-checked={mode === 'chromatic'}
-            className={`mode-btn ${mode === 'chromatic' ? 'on' : ''}`}
-            onClick={() => setMode('chromatic')}
-          >
-            Chromatic
-          </button>
-          <button
-            role="radio"
-            aria-checked={mode === 'fifths'}
-            className={`mode-btn ${mode === 'fifths' ? 'on' : ''}`}
-            onClick={() => setMode('fifths')}
-          >
-            Fifths
-          </button>
-        </div>
-
         <div className="circle-wrap">
           <CircleOfFifths activePosition={activePosition} mode={mode} />
+          <div className="hub">
+            <div className="mode-toggle" role="radiogroup" aria-label="Layout mode">
+              <button
+                role="radio"
+                aria-checked={mode === 'chromatic'}
+                className={`mode-btn ${mode === 'chromatic' ? 'on' : ''}`}
+                onClick={() => setMode('chromatic')}
+              >
+                Chromatic
+              </button>
+              <button
+                role="radio"
+                aria-checked={mode === 'fifths'}
+                className={`mode-btn ${mode === 'fifths' ? 'on' : ''}`}
+                onClick={() => setMode('fifths')}
+              >
+                Fifths
+              </button>
+            </div>
+            {listening ? (
+              <button onClick={stop} className="btn stop">
+                Stop
+              </button>
+            ) : (
+              <button onClick={start} className="btn start">
+                Listen
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="readout">
-          <div className="readout-row">
-            <span className="readout-label">note</span>
-            <span className="readout-value note">
-              {noteName}
-              {octave !== null && <small>{octave}</small>}
-            </span>
-          </div>
-          <div className="readout-row">
-            <span className="readout-label">freq</span>
-            <span className="readout-value">
-              {detection ? `${detection.frequency.toFixed(1)} Hz` : '—'}
-            </span>
-          </div>
-          <div className="readout-row">
-            <span className="readout-label">cents</span>
-            <span className="readout-value">
-              {detection
-                ? `${detection.cents > 0 ? '+' : ''}${detection.cents.toFixed(0)}`
-                : '—'}
-            </span>
-          </div>
-          <div className="readout-row">
-            <span className="readout-label">+ fifth</span>
-            <span className="readout-value">{fifthUp ?? '—'}</span>
-          </div>
-          <div className="readout-row">
-            <span className="readout-label">− fifth</span>
-            <span className="readout-value">{fifthDown ?? '—'}</span>
-          </div>
-        </div>
-
-        <div className="controls">
-          {listening ? (
-            <button onClick={stop} className="btn stop">
-              Stop listening
-            </button>
-          ) : (
-            <button onClick={start} className="btn start">
-              Start listening
-            </button>
-          )}
+            <div className="readout-row">
+              <span className="readout-label">note</span>
+              <span className="readout-value note">
+                {noteName}
+                {octave !== null && <small>{octave}</small>}
+              </span>
+            </div>
+            <div className="readout-row">
+              <span className="readout-label">freq</span>
+              <span className="readout-value">
+                {detection ? `${detection.frequency.toFixed(1)} Hz` : '—'}
+              </span>
+            </div>
+            <div className="readout-row">
+              <span className="readout-label">cents</span>
+              <span className="readout-value">
+                {detection
+                  ? `${detection.cents > 0 ? '+' : ''}${detection.cents.toFixed(0)}`
+                  : '—'}
+              </span>
+            </div>
+            <div className="readout-row">
+              <span className="readout-label">+ fifth</span>
+              <span className="readout-value">{fifthUp ?? '—'}</span>
+            </div>
+            <div className="readout-row">
+              <span className="readout-label">− fifth</span>
+              <span className="readout-value">{fifthDown ?? '—'}</span>
+            </div>
         </div>
 
         {error && <div className="error">{error}</div>}

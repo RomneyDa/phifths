@@ -18,7 +18,7 @@ export function CircleOfFifths({ activePosition, mode, size = 520 }: Props) {
   const cx = size / 2;
   const cy = size / 2;
   const outerR = size * 0.46;
-  const innerR = size * 0.18;
+  const innerR = size * 0.30;
   const labelR = (outerR + innerR) / 2;
   const fifthsLabelR = outerR + size * 0.025;
 
@@ -112,26 +112,6 @@ export function CircleOfFifths({ activePosition, mode, size = 520 }: Props) {
       })}
 
       <circle cx={cx} cy={cy} r={innerR} fill="#0a0b14" stroke="#22263a" />
-      <text
-        x={cx}
-        y={cy - size * 0.015}
-        textAnchor="middle"
-        fontSize={size * 0.038}
-        fill="#9aa0c8"
-        fontWeight={500}
-      >
-        circle of
-      </text>
-      <text
-        x={cx}
-        y={cy + size * 0.03}
-        textAnchor="middle"
-        fontSize={size * 0.05}
-        fill="#e6e8ff"
-        fontWeight={700}
-      >
-        {mode === 'fifths' ? 'fifths' : 'notes'}
-      </text>
     </svg>
   );
 }
