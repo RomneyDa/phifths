@@ -418,38 +418,25 @@ export default function App() {
               </button>
             </div>
 
-            {phase === 'idle' && (
-              <div
-                className="action-toggle"
-                role="radiogroup"
-                aria-label="Action"
-              >
-                <button
-                  role="radio"
-                  aria-checked={!recordMode}
-                  className={`action-btn ${!recordMode ? 'on' : ''}`}
-                  onClick={() => setRecordMode(false)}
-                >
-                  Listen
-                </button>
-                <button
-                  role="radio"
-                  aria-checked={recordMode}
-                  className={`action-btn record ${recordMode ? 'on' : ''}`}
-                  onClick={() => setRecordMode(true)}
-                >
-                  <span className="action-dot" aria-hidden="true" />
-                  Record
-                </button>
-              </div>
-            )}
-
             <button onClick={onMainButton} className={buttonClass}>
               {phase === 'live' && recordModeAtStartRef.current && (
                 <span className="rec-dot" aria-hidden="true" />
               )}
               {buttonLabel}
             </button>
+
+            {phase === 'idle' && (
+              <button
+                type="button"
+                role="switch"
+                aria-checked={recordMode}
+                className={`record-toggle ${recordMode ? 'on' : ''}`}
+                onClick={() => setRecordMode((v) => !v)}
+              >
+                <span className="record-toggle-dot" aria-hidden="true" />
+                Record
+              </button>
+            )}
 
             {phase === 'live' && recordModeAtStartRef.current && (
               <div className="timer">{formatDuration(elapsed)}</div>

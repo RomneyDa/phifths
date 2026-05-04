@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   type Recording,
   deleteRecording,
@@ -6,6 +6,8 @@ import {
   listRecordings,
   renameRecording,
 } from './recordings';
+
+const CONFIRM_TIMEOUT_MS = 4000;
 
 type Props = {
   refreshKey: number;
@@ -25,6 +27,8 @@ export function RecordingsStrip({
   const [items, setItems] = useState<Recording[] | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const confirmTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,9 +40,24 @@ export function RecordingsStrip({
     };
   }, [refreshKey]);
 
-  const handleDelete = async (id: string) => {
-    await deleteRecording(id);
-    onRefresh();
+  useEffect(() => {
+    if (!confirmDeleteId) return;
+    confirmTimerRef.current = window.setTimeout(() => {
+      setConfirmDeleteId(null);
+    }, CONFIRM_TIMEOUT_MS);
+    return () => {
+      if (confirmTimerRef.current) window.clearTimeout(confirmTimerRef.current);
+    };
+  }, [confirmDeleteId]);
+
+  const handleDeleteClick = async (id: string) => {
+    if (confirmDeleteId === id) {
+      setConfirmDeleteId(null);
+      await deleteRecording(id);
+      onRefresh();
+    } else {
+      setConfirmDeleteId(id);
+    }
   };
 
   const startRename = (rec: Recording) => {
@@ -82,42 +101,46 @@ export function RecordingsStrip({
             >
               {isPlaying ? <StopIcon /> : <PlayIcon />}
             </button>
-            <div className="rec-card-meta">
-              {isEditing ? (
-                <input
-                  autoFocus
-                  className="rec-card-rename"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={commitRename}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') commitRename();
-                    else if (e.key === 'Escape') {
-                      setEditingId(null);
-                      setEditValue('');
-                    }
-                  }}
-                />
-              ) : (
-                <button
-                  type="button"
-                  className="rec-card-name"
-                  onClick={() => startRename(rec)}
-                  title="Rename"
-                >
-                  {rec.name}
-                </button>
-              )}
-              <span className="rec-card-dur">{formatDuration(rec.duration)}</span>
-            </div>
+            {isEditing ? (
+              <input
+                autoFocus
+                className="rec-card-rename"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onBlur={commitRename}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') commitRename();
+                  else if (e.key === 'Escape') {
+                    setEditingId(null);
+                    setEditValue('');
+                  }
+                }}
+              />
+            ) : (
+              <button
+                type="button"
+                className="rec-card-name"
+                onClick={() => startRename(rec)}
+                title="Rename"
+              >
+                {rec.name}
+              </button>
+            )}
+            <span className="rec-card-dur">{formatDuration(rec.duration)}</span>
             <button
               type="button"
-              className="rec-card-del"
-              onClick={() => handleDelete(rec.id)}
-              aria-label={`Delete ${rec.name}`}
-              title="Delete"
+              className={`rec-card-del ${confirmDeleteId === rec.id ? 'armed' : ''}`}
+              onClick={() => handleDeleteClick(rec.id)}
+              aria-label={
+                confirmDeleteId === rec.id
+                  ? `Tap again to confirm deleting ${rec.name}`
+                  : `Delete ${rec.name}`
+              }
+              title={
+                confirmDeleteId === rec.id ? 'Tap again to confirm' : 'Delete'
+              }
             >
-              <CloseIcon />
+              {confirmDeleteId === rec.id ? <CheckIcon /> : <CloseIcon />}
             </button>
           </div>
         );
@@ -144,6 +167,13 @@ function CloseIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
       <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+function CheckIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12l5 5L20 7" />
     </svg>
   );
 }
