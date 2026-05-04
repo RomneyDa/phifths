@@ -6,7 +6,6 @@ import {
 } from './notes';
 
 type Props = {
-  /** Position 0..11 of the active note in the current layout, or null. */
   activePosition: number | null;
   mode: LayoutMode;
   size?: number;
@@ -137,8 +136,6 @@ export function CircleOfFifths({ activePosition, mode, size = 520 }: Props) {
   );
 }
 
-// Only emphasize the perfect-fifth neighbors visually in chromatic mode.
-// In fifths mode they're already obvious — they sit adjacent to the active sector.
 function shouldEmphasizeFifth(distance: number | null, mode: LayoutMode): boolean {
   return mode === 'chromatic' && distance !== null && Math.abs(distance) === 1;
 }
@@ -174,7 +171,6 @@ function sectorFill(distance: number | null, isActive: boolean, mode: LayoutMode
   if (isActive) return '#7aa2ff';
 
   if (mode === 'fifths') {
-    // Closer to the detected note in fifths = brighter.
     const d = Math.abs(distance);
     const t = 1 - (d - 1) / 5;
     const hue = 220 - t * 40;
@@ -183,7 +179,6 @@ function sectorFill(distance: number | null, isActive: boolean, mode: LayoutMode
     return `hsl(${hue} ${sat}% ${light}%)`;
   }
 
-  // Chromatic: emphasize only the perfect-fifth neighbors (±1 in fifths-distance).
   if (Math.abs(distance) === 1) return 'hsl(260 45% 38%)';
   return '#15182a';
 }

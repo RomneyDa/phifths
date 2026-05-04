@@ -19,16 +19,14 @@ type DetectionState = {
   cents: number;
 };
 
-// How many recent frames to consider when computing the stable note (~200ms at 60fps).
 const SMOOTHING_WINDOW = 12;
-// How many frames of silence before we clear the displayed note.
 const SILENCE_TIMEOUT_MS = 500;
 
 export default function App() {
   const [listening, setListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [detection, setDetection] = useState<DetectionState | null>(null);
-  const [mode, setMode] = useState<LayoutMode>('fifths');
+  const [mode, setMode] = useState<LayoutMode>('chromatic');
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -36,10 +34,8 @@ export default function App() {
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
 
-  // Sliding window of recent (midi, freq) detections for smoothing.
   const recentRef = useRef<{ midi: number; freq: number }[]>([]);
   const lastDetectionAt = useRef<number>(0);
-  // Track the currently displayed midi so we only push state changes when it actually moves.
   const displayedMidiRef = useRef<number | null>(null);
 
   const stop = useCallback(() => {
@@ -105,22 +101,14 @@ export default function App() {
           if (recent.length > SMOOTHING_WINDOW) recent.shift();
           lastDetectionAt.current = performance.now();
 
-          // Median midi across the window resists single-frame outliers
-          // (octave errors, brief noise, etc.).
           const sortedMidi = recent.map((r) => r.midi).sort((a1, b1) => a1 - b1);
           const stableMidi = sortedMidi[Math.floor(sortedMidi.length / 2)];
 
-          // Average frequency among entries that match the stable midi —
-          // gives a smooth cents readout without jumping the displayed note.
           const matching = recent.filter((r) => r.midi === stableMidi);
           const avgFreq =
             matching.reduce((s, r) => s + r.freq, 0) / Math.max(1, matching.length);
 
-          if (
-            displayedMidiRef.current !== stableMidi ||
-            // Refresh cents/freq periodically even when note is unchanged.
-            recent.length % 4 === 0
-          ) {
+          if (displayedMidiRef.current !== stableMidi || recent.length % 4 === 0) {
             displayedMidiRef.current = stableMidi;
             const pitchClass = ((stableMidi % 12) + 12) % 12;
             setDetection({
@@ -155,8 +143,6 @@ export default function App() {
 
   const noteName = detection ? midiToNoteName(detection.midi) : '—';
   const octave = detection ? midiToOctave(detection.midi) : null;
-  // Perfect fifth above (chromatic +7) and below (-7) the current note,
-  // independent of layout mode.
   const fifthUp = detection ? CHROMATIC_LABELS[(detection.pitchClass + 7) % 12] : null;
   const fifthDown = detection ? CHROMATIC_LABELS[(detection.pitchClass + 5) % 12] : null;
 
@@ -177,29 +163,22 @@ export default function App() {
       </header>
 
       <main className="main">
-        <p className="tagline">
-          Sing or play a note. The circle lights up live and shows every other
-          note's distance in fifths from yours.
-        </p>
-
         <div className="mode-toggle" role="radiogroup" aria-label="Layout mode">
-          <button
-            role="radio"
-            aria-checked={mode === 'fifths'}
-            className={`mode-btn ${mode === 'fifths' ? 'on' : ''}`}
-            onClick={() => setMode('fifths')}
-          >
-            Circle of fifths
-            <small>fifths sit adjacent</small>
-          </button>
           <button
             role="radio"
             aria-checked={mode === 'chromatic'}
             className={`mode-btn ${mode === 'chromatic' ? 'on' : ''}`}
             onClick={() => setMode('chromatic')}
           >
-            Chromatic order
-            <small>fifth highlighted across</small>
+            Chromatic
+          </button>
+          <button
+            role="radio"
+            aria-checked={mode === 'fifths'}
+            className={`mode-btn ${mode === 'fifths' ? 'on' : ''}`}
+            onClick={() => setMode('fifths')}
+          >
+            Fifths
           </button>
         </div>
 
@@ -252,14 +231,6 @@ export default function App() {
         </div>
 
         {error && <div className="error">{error}</div>}
-
-        <footer>
-          <p>
-            Position labels (+1, −1, …) show signed distance in fifths. A perfect
-            fifth above your note sits one step clockwise on the circle of fifths,
-            or seven steps clockwise on the chromatic circle.
-          </p>
-        </footer>
       </main>
     </div>
   );
