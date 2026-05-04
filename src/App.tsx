@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CircleOfFifths } from './CircleOfFifths';
-import { RecordingsLibrary } from './RecordingsLibrary';
+import { RecordingsStrip } from './RecordingsStrip';
 import { autoCorrelate } from './pitchDetector';
 import {
   CHROMATIC_LABELS,
@@ -45,7 +45,6 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [detection, setDetection] = useState<DetectionState | null>(null);
   const [recordMode, setRecordMode] = useState(false);
-  const [libraryOpen, setLibraryOpen] = useState(false);
   const [playback, setPlayback] = useState<Recording | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [libraryRefresh, setLibraryRefresh] = useState(0);
@@ -280,7 +279,6 @@ export default function App() {
   const playRecording = useCallback((rec: Recording) => {
     if (phase === 'live') return;
     if (phase === 'playback') cancelPlayback();
-    setLibraryOpen(false);
     setError(null);
     setPlayback(rec);
     playbackRef.current = rec;
@@ -368,15 +366,6 @@ export default function App() {
     <div className="app">
       <h1 className="brand">phifths</h1>
       <div className="corner-actions">
-        <button
-          type="button"
-          className="icon-btn"
-          onClick={() => setLibraryOpen(true)}
-          aria-label="Recordings library"
-          title="Recordings"
-        >
-          <LibraryIcon />
-        </button>
         <button
           type="button"
           className="icon-btn"
@@ -509,17 +498,16 @@ export default function App() {
           </div>
         </div>
 
-        {error && <div className="error">{error}</div>}
-      </main>
-
-      {libraryOpen && (
-        <RecordingsLibrary
-          onClose={() => setLibraryOpen(false)}
-          onPlay={playRecording}
+        <RecordingsStrip
           refreshKey={libraryRefresh}
           onRefresh={() => setLibraryRefresh((n) => n + 1)}
+          onPlay={playRecording}
+          onCancel={cancelPlayback}
+          playingId={phase === 'playback' ? playback?.id ?? null : null}
         />
-      )}
+
+        {error && <div className="error">{error}</div>}
+      </main>
     </div>
   );
 }
@@ -564,22 +552,3 @@ function GitHubIcon() {
   );
 }
 
-function LibraryIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="3" y="4" width="4" height="16" rx="1" />
-      <rect x="10" y="4" width="4" height="16" rx="1" />
-      <path d="M17 6l3 1-3 12-3-1z" />
-    </svg>
-  );
-}

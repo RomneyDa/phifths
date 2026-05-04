@@ -10,13 +10,11 @@
   position: absolute;
   top: 16px;
   left: 20px;
-  font-size: 22px;
+  font-size: 20px;
   margin: 0;
-  letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+  color: var(--text);
   z-index: 5;
   pointer-events: none;
 }
@@ -198,15 +196,15 @@
 }
 
 .btn {
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 700;
-  padding: 16px 40px;
+  padding: 20px 52px;
   border-radius: 999px;
   border: 1px solid transparent;
   cursor: pointer;
   transition: transform 80ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
   letter-spacing: 0.02em;
-  min-width: 170px;
+  min-width: 200px;
 }
 
 .btn.start {
@@ -391,9 +389,9 @@
     padding: 6px 12px;
   }
   .btn {
-    font-size: 17px;
-    padding: 13px 32px;
-    min-width: 150px;
+    font-size: 18px;
+    padding: 16px 40px;
+    min-width: 170px;
   }
 }
 
@@ -409,167 +407,153 @@
   }
 }
 
-.library-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 11, 20, 0.6);
-  backdrop-filter: blur(4px);
-  z-index: 50;
+.rec-strip {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  animation: fadeIn 160ms ease-out;
+  gap: 8px;
+  overflow-x: auto;
+  width: min(540px, 92vw);
+  padding: 4px 2px 6px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.rec-strip::-webkit-scrollbar {
+  height: 6px;
+}
+.rec-strip::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+.rec-strip::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.library-sheet {
+.rec-empty {
+  width: min(540px, 92vw);
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-subtle);
+  line-height: 1.5;
+  padding: 8px 12px;
+}
+
+.rec-empty strong {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.rec-card {
+  flex: 0 0 auto;
+  width: 168px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  width: 100%;
-  max-width: 480px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-
-.library-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-}
-
-.library-header h2 {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.library-empty {
-  padding: 32px 24px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.library-list {
-  list-style: none;
-  margin: 0;
-  padding: 6px;
-  overflow-y: auto;
-}
-
-.library-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  border-radius: 12px;
   padding: 8px 10px;
-  border-radius: 10px;
-  transition: background 120ms;
+  display: grid;
+  grid-template-columns: 30px 1fr 22px;
+  align-items: center;
+  gap: 8px;
+  scroll-snap-align: start;
+  transition: border-color 160ms;
 }
 
-.library-item:hover {
-  background: color-mix(in srgb, var(--brand-1) 6%, transparent);
+.rec-card.playing {
+  border-color: color-mix(in srgb, var(--brand-1) 60%, var(--border));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand-1) 40%, transparent);
 }
 
-.library-play {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+.rec-card-play {
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
-  border: none;
   color: var(--bg);
+  border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  padding: 0;
   transition: transform 80ms;
 }
 
-.library-play:hover {
-  transform: scale(1.05);
+.rec-card.playing .rec-card-play {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
-.library-meta {
-  flex: 1;
-  min-width: 0;
+.rec-card-play:hover {
+  transform: scale(1.06);
+}
+
+.rec-card-meta {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  min-width: 0;
 }
 
-.library-name {
+.rec-card-name {
   background: none;
   border: none;
   color: var(--text);
   text-align: left;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   padding: 0;
-  cursor: pointer;
+  cursor: text;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: inherit;
 }
 
-.library-name:hover {
+.rec-card-name:hover {
   color: var(--brand-1);
 }
 
-.library-sub {
-  font-size: 12px;
+.rec-card-rename {
+  background: var(--bg);
+  border: 1px solid var(--brand-1);
+  border-radius: 6px;
+  padding: 3px 6px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+}
+
+.rec-card-dur {
+  font-size: 11px;
   color: var(--text-subtle);
+  font-variant-numeric: tabular-nums;
 }
 
-.library-actions {
-  display: flex;
-  gap: 2px;
-  flex-shrink: 0;
+.rec-card-del {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-subtle);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 160ms, background 160ms;
 }
 
-.icon-btn.small {
-  width: 32px;
-  height: 32px;
-}
-
-.icon-btn.danger:hover {
+.rec-card-del:hover {
   color: #ff8a8a;
   background: color-mix(in srgb, #ff5577 12%, transparent);
 }
 
-.rename-input {
-  flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--brand-1);
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: var(--text);
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-}
-
 @media (max-width: 540px) {
-  .library-backdrop {
-    padding: 0;
-    align-items: flex-end;
-  }
-  .library-sheet {
-    max-width: 100%;
-    max-height: 75vh;
-    border-radius: 16px 16px 0 0;
-    border-bottom: none;
+  .rec-card {
+    width: 152px;
   }
 }

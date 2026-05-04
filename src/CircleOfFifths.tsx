@@ -53,7 +53,7 @@ export function CircleOfFifths({ activePosition, cents, mode, theme, size = 520 
         </filter>
       </defs>
 
-      <circle cx={cx} cy={cy} r={outerR + size * 0.05} fill="url(#bgGrad)" />
+      <circle cx={cx} cy={cy} r={size * 0.495} fill="url(#bgGrad)" />
 
       {labels.map((label, i) => {
         const a0 = startAngle + i * sweep;
