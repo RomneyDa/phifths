@@ -108,7 +108,7 @@ export default function App() {
           const avgFreq =
             matching.reduce((s, r) => s + r.freq, 0) / Math.max(1, matching.length);
 
-          if (displayedMidiRef.current !== stableMidi || recent.length % 4 === 0) {
+          if (displayedMidiRef.current !== stableMidi || recent.length % 2 === 0) {
             displayedMidiRef.current = stableMidi;
             const pitchClass = ((stableMidi % 12) + 12) % 12;
             setDetection({
@@ -148,23 +148,24 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="topbar">
-        <h1 className="brand">phifths</h1>
-        <a
-          className="gh"
-          href="https://github.com/RomneyDa/phifths"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="View phifths on GitHub"
-        >
-          <GitHubIcon />
-          <span>GitHub</span>
-        </a>
-      </header>
+      <h1 className="brand">phifths</h1>
+      <a
+        className="gh"
+        href="https://github.com/RomneyDa/phifths"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="View phifths on GitHub"
+      >
+        <GitHubIcon />
+      </a>
 
       <main className="main">
         <div className="circle-wrap">
-          <CircleOfFifths activePosition={activePosition} mode={mode} />
+          <CircleOfFifths
+            activePosition={activePosition}
+            cents={detection?.cents ?? null}
+            mode={mode}
+          />
           <div className="hub">
             <div className="mode-toggle" role="radiogroup" aria-label="Layout mode">
               <button

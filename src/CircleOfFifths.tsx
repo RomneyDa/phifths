@@ -7,13 +7,14 @@ import {
 
 type Props = {
   activePosition: number | null;
+  cents: number | null;
   mode: LayoutMode;
   size?: number;
 };
 
 const SECTORS = 12;
 
-export function CircleOfFifths({ activePosition, mode, size = 520 }: Props) {
+export function CircleOfFifths({ activePosition, cents, mode, size = 520 }: Props) {
   const labels = labelsForMode(mode);
   const cx = size / 2;
   const cy = size / 2;
@@ -41,6 +42,13 @@ export function CircleOfFifths({ activePosition, mode, size = 520 }: Props) {
           <stop offset="0%" stopColor="#1a1d2e" />
           <stop offset="100%" stopColor="#0a0b14" />
         </radialGradient>
+        <filter id="needleGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation={size * 0.006} result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
 
       <circle cx={cx} cy={cy} r={outerR + size * 0.05} fill="url(#bgGrad)" />
@@ -112,6 +120,29 @@ export function CircleOfFifths({ activePosition, mode, size = 520 }: Props) {
       })}
 
       <circle cx={cx} cy={cy} r={innerR} fill="#0a0b14" stroke="#22263a" />
+
+      {activePosition !== null && cents !== null && (() => {
+        const sectorCenter = startAngle + activePosition * sweep + sweep / 2;
+        const angle = sectorCenter + (cents / 100) * sweep;
+        const r1 = innerR;
+        const r2 = outerR + size * 0.012;
+        const x1 = cx + Math.cos(angle) * r1;
+        const y1 = cy + Math.sin(angle) * r1;
+        const x2 = cx + Math.cos(angle) * r2;
+        const y2 = cy + Math.sin(angle) * r2;
+        return (
+          <line
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+            stroke="#fff"
+            strokeWidth={size * 0.006}
+            strokeLinecap="round"
+            filter="url(#needleGlow)"
+          />
+        );
+      })()}
     </svg>
   );
 }

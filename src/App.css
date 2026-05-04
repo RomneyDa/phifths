@@ -2,19 +2,13 @@
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-}
-
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-  border-bottom: 1px solid #1b1e30;
-  background: rgba(10, 11, 20, 0.7);
-  backdrop-filter: blur(8px);
+  position: relative;
 }
 
 .brand {
+  position: absolute;
+  top: 16px;
+  left: 20px;
   font-size: 22px;
   margin: 0;
   letter-spacing: -0.02em;
@@ -22,25 +16,28 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  z-index: 5;
+  pointer-events: none;
 }
 
 .gh {
+  position: absolute;
+  top: 14px;
+  right: 18px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: #e6e8ff;
+  justify-content: center;
+  color: #9aa0c8;
   text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 6px 12px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
-  border: 1px solid #22263a;
-  background: #0f1224;
-  transition: border-color 200ms, transform 80ms;
+  transition: color 200ms, transform 80ms;
+  z-index: 5;
 }
 
 .gh:hover {
-  border-color: #3a3f63;
+  color: #e6e8ff;
   transform: translateY(-1px);
 }
 
@@ -245,13 +242,13 @@
 }
 
 @media (max-width: 380px) {
-  .topbar {
-    padding: 8px 14px;
-  }
   .brand {
+    top: 12px;
+    left: 14px;
     font-size: 19px;
   }
-  .gh span {
-    display: none;
+  .gh {
+    top: 10px;
+    right: 12px;
   }
 }
