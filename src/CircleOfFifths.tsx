@@ -1,14 +1,21 @@
-import { CIRCLE_LABELS, signedFifthsDistance } from './notes';
+import {
+  type LayoutMode,
+  labelsForMode,
+  positionToPitchClass,
+  signedFifthsBetweenPitchClasses,
+} from './notes';
 
 type Props = {
-  /** Index 0..11 on the circle of fifths, or null if no pitch detected. */
+  /** Position 0..11 of the active note in the current layout, or null. */
   activePosition: number | null;
+  mode: LayoutMode;
   size?: number;
 };
 
 const SECTORS = 12;
 
-export function CircleOfFifths({ activePosition, size = 520 }: Props) {
+export function CircleOfFifths({ activePosition, mode, size = 520 }: Props) {
+  const labels = labelsForMode(mode);
   const cx = size / 2;
   const cy = size / 2;
   const outerR = size * 0.46;
@@ -17,8 +24,10 @@ export function CircleOfFifths({ activePosition, size = 520 }: Props) {
   const fifthsLabelR = outerR + size * 0.025;
 
   const sweep = (2 * Math.PI) / SECTORS;
-  // Rotate so position 0 (C) is at the top, sectors centered on each label.
   const startAngle = -Math.PI / 2 - sweep / 2;
+
+  const activePc =
+    activePosition === null ? null : positionToPitchClass(activePosition, mode);
 
   return (
     <svg
@@ -26,7 +35,7 @@ export function CircleOfFifths({ activePosition, size = 520 }: Props) {
       width="100%"
       height="100%"
       role="img"
-      aria-label="Circle of fifths"
+      aria-label={`Circle of ${mode === 'fifths' ? 'fifths' : 'chromatic notes'}`}
     >
       <defs>
         <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
@@ -37,17 +46,20 @@ export function CircleOfFifths({ activePosition, size = 520 }: Props) {
 
       <circle cx={cx} cy={cy} r={outerR + size * 0.05} fill="url(#bgGrad)" />
 
-      {CIRCLE_LABELS.map((label, i) => {
+      {labels.map((label, i) => {
         const a0 = startAngle + i * sweep;
         const a1 = a0 + sweep;
         const path = sectorPath(cx, cy, innerR, outerR, a0, a1);
 
+        const positionPc = positionToPitchClass(i, mode);
         const distance =
-          activePosition === null ? null : signedFifthsDistance(activePosition, i);
+          activePc === null ? null : signedFifthsBetweenPitchClasses(activePc, positionPc);
         const isActive = distance === 0;
 
-        const fill = sectorFill(distance, isActive);
-        const stroke = isActive ? '#fff' : '#22263a';
+        const fill = sectorFill(distance, isActive, mode);
+        const stroke = sectorStroke(distance, isActive, mode);
+        const emphasizeFifth = shouldEmphasizeFifth(distance, mode);
+        const strokeWidth = isActive ? 3 : emphasizeFifth ? 2 : 1;
 
         const labelAngle = (a0 + a1) / 2;
         const lx = cx + Math.cos(labelAngle) * labelR;
@@ -56,14 +68,19 @@ export function CircleOfFifths({ activePosition, size = 520 }: Props) {
         const fx = cx + Math.cos(labelAngle) * fifthsLabelR;
         const fy = cy + Math.sin(labelAngle) * fifthsLabelR;
 
+        const showDistance = distance !== null && distance !== 0;
+
         return (
-          <g key={label}>
+          <g key={i}>
             <path
               d={path}
               fill={fill}
               stroke={stroke}
-              strokeWidth={isActive ? 3 : 1}
-              style={{ transition: 'fill 120ms linear, stroke 120ms linear' }}
+              strokeWidth={strokeWidth}
+              style={{
+                transition:
+                  'fill 180ms ease-out, stroke 180ms ease-out, stroke-width 180ms ease-out',
+              }}
             />
             <text
               x={lx}
@@ -77,14 +94,15 @@ export function CircleOfFifths({ activePosition, size = 520 }: Props) {
             >
               {label}
             </text>
-            {distance !== null && distance !== 0 && (
+            {showDistance && (
               <text
                 x={fx}
                 y={fy}
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fontSize={size * 0.025}
-                fill="#9aa0c8"
+                fill={emphasizeFifth ? '#7aa2ff' : '#9aa0c8'}
+                fontWeight={emphasizeFifth ? 700 : 400}
                 style={{ pointerEvents: 'none', userSelect: 'none' }}
               >
                 {distance > 0 ? `+${distance}` : distance}
@@ -113,10 +131,16 @@ export function CircleOfFifths({ activePosition, size = 520 }: Props) {
         fill="#e6e8ff"
         fontWeight={700}
       >
-        fifths
+        {mode === 'fifths' ? 'fifths' : 'notes'}
       </text>
     </svg>
   );
+}
+
+// Only emphasize the perfect-fifth neighbors visually in chromatic mode.
+// In fifths mode they're already obvious — they sit adjacent to the active sector.
+function shouldEmphasizeFifth(distance: number | null, mode: LayoutMode): boolean {
+  return mode === 'chromatic' && distance !== null && Math.abs(distance) === 1;
 }
 
 function sectorPath(
@@ -145,15 +169,33 @@ function sectorPath(
   ].join(' ');
 }
 
-function sectorFill(distance: number | null, isActive: boolean): string {
+function sectorFill(distance: number | null, isActive: boolean, mode: LayoutMode): string {
   if (distance === null) return '#15182a';
   if (isActive) return '#7aa2ff';
-  // Closer to the detected note in fifths = warmer/brighter.
-  // |distance| ranges 1..6.
-  const d = Math.abs(distance);
-  const t = 1 - (d - 1) / 5; // 1 (closest) → 0 (tritone)
-  const hue = 220 - t * 40; // 220 (cool blue) → 180 (teal-ish)
-  const sat = 30 + t * 30;
-  const light = 18 + t * 22;
-  return `hsl(${hue} ${sat}% ${light}%)`;
+
+  if (mode === 'fifths') {
+    // Closer to the detected note in fifths = brighter.
+    const d = Math.abs(distance);
+    const t = 1 - (d - 1) / 5;
+    const hue = 220 - t * 40;
+    const sat = 30 + t * 30;
+    const light = 18 + t * 22;
+    return `hsl(${hue} ${sat}% ${light}%)`;
+  }
+
+  // Chromatic: emphasize only the perfect-fifth neighbors (±1 in fifths-distance).
+  if (Math.abs(distance) === 1) return 'hsl(260 45% 38%)';
+  return '#15182a';
+}
+
+function sectorStroke(
+  distance: number | null,
+  isActive: boolean,
+  mode: LayoutMode,
+): string {
+  if (isActive) return '#fff';
+  if (mode === 'chromatic' && distance !== null && Math.abs(distance) === 1) {
+    return '#b58dff';
+  }
+  return '#22263a';
 }
