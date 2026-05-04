@@ -384,7 +384,11 @@ export default function App() {
           aria-label={`Theme: ${theme.label} (click to change)`}
           title={`Theme: ${theme.label}`}
         >
-          <ThemeSwatch colors={theme.noteColors} />
+          <ThemeSwatch
+            colors={theme.noteColors}
+            coreColor={theme.bg}
+            ringColor={theme.border}
+          />
         </button>
         <a
           className="icon-btn"
@@ -425,24 +429,38 @@ export default function App() {
               </button>
             </div>
 
+            {phase === 'idle' && (
+              <div
+                className="action-toggle"
+                role="radiogroup"
+                aria-label="Action"
+              >
+                <button
+                  role="radio"
+                  aria-checked={!recordMode}
+                  className={`action-btn ${!recordMode ? 'on' : ''}`}
+                  onClick={() => setRecordMode(false)}
+                >
+                  Listen
+                </button>
+                <button
+                  role="radio"
+                  aria-checked={recordMode}
+                  className={`action-btn record ${recordMode ? 'on' : ''}`}
+                  onClick={() => setRecordMode(true)}
+                >
+                  <span className="action-dot" aria-hidden="true" />
+                  Record
+                </button>
+              </div>
+            )}
+
             <button onClick={onMainButton} className={buttonClass}>
               {phase === 'live' && recordModeAtStartRef.current && (
                 <span className="rec-dot" aria-hidden="true" />
               )}
               {buttonLabel}
             </button>
-
-            {phase === 'idle' && (
-              <label className="record-toggle">
-                <input
-                  type="checkbox"
-                  checked={recordMode}
-                  onChange={(e) => setRecordMode(e.target.checked)}
-                />
-                <span className="record-dot" />
-                Record
-              </label>
-            )}
 
             {phase === 'live' && recordModeAtStartRef.current && (
               <div className="timer">{formatDuration(elapsed)}</div>
@@ -506,7 +524,15 @@ export default function App() {
   );
 }
 
-function ThemeSwatch({ colors }: { colors: readonly string[] }) {
+function ThemeSwatch({
+  colors,
+  coreColor,
+  ringColor,
+}: {
+  colors: readonly string[];
+  coreColor: string;
+  ringColor: string;
+}) {
   const sweep = 360 / colors.length;
   const slices = colors
     .map((c, i) => `${c} ${i * sweep}deg ${(i + 1) * sweep}deg`)
@@ -514,8 +540,13 @@ function ThemeSwatch({ colors }: { colors: readonly string[] }) {
   return (
     <span
       className="swatch"
-      style={{ background: `conic-gradient(from -90deg, ${slices})` }}
-    />
+      style={{
+        background: `conic-gradient(from -90deg, ${slices})`,
+        borderColor: ringColor,
+      }}
+    >
+      <span className="swatch-core" style={{ background: coreColor }} />
+    </span>
   );
 }
 
