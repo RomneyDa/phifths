@@ -1,0 +1,135 @@
+.app {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 56px;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #7aa2ff, #b58dff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tagline {
+  margin: 0;
+  color: #9aa0c8;
+  max-width: 560px;
+}
+
+.circle-wrap {
+  width: min(560px, 92vw);
+  aspect-ratio: 1 / 1;
+}
+
+.readout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px 24px;
+  width: 100%;
+  max-width: 560px;
+  background: #0f1224;
+  border: 1px solid #22263a;
+  border-radius: 14px;
+  padding: 16px 20px;
+}
+
+.readout-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.readout-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #6b7099;
+}
+
+.readout-value {
+  font-size: 22px;
+  font-weight: 600;
+  color: #e6e8ff;
+  font-variant-numeric: tabular-nums;
+}
+
+.readout-value.note {
+  font-size: 32px;
+  background: linear-gradient(135deg, #7aa2ff, #b58dff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.readout-value.note small {
+  font-size: 16px;
+  color: #9aa0c8;
+  -webkit-text-fill-color: #9aa0c8;
+  margin-left: 4px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 80ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.btn.start {
+  background: linear-gradient(135deg, #7aa2ff, #b58dff);
+  color: #0a0b14;
+}
+
+.btn.stop {
+  background: #22263a;
+  color: #e6e8ff;
+  border-color: #2f3454;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(122, 162, 255, 0.2);
+}
+
+.btn:focus-visible {
+  outline: 2px solid #7aa2ff;
+  outline-offset: 3px;
+}
+
+.error {
+  color: #ff8a8a;
+  background: #2a1620;
+  border: 1px solid #5a2a3a;
+  padding: 10px 14px;
+  border-radius: 10px;
+  max-width: 560px;
+}
+
+footer {
+  color: #6b7099;
+  font-size: 13px;
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+footer p {
+  margin: 0;
+}
