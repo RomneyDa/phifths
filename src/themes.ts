@@ -106,7 +106,7 @@ export const themes: Record<string, Theme> = {
 };
 
 export const THEME_ORDER = ['scriabin-dark', 'scriabin-light', 'mono-dark'] as const;
-export const DEFAULT_THEME_ID = 'scriabin-dark';
+export const DEFAULT_THEME_ID = 'scriabin-light';
 
 const VAR_NAME: Partial<Record<keyof Theme, string>> = {
   bg: '--bg',
