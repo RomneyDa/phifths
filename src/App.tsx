@@ -456,20 +456,20 @@ export default function App() {
         <div className="readout">
           <div className="readout-row">
             <span className="readout-label">note</span>
-            <span className="readout-value note">
+            <span className="readout-value v-note">
               {noteName}
               {octave !== null && <small>{octave}</small>}
             </span>
           </div>
           <div className="readout-row">
             <span className="readout-label">freq</span>
-            <span className="readout-value">
+            <span className="readout-value v-freq">
               {detection ? `${detection.frequency.toFixed(1)} Hz` : '—'}
             </span>
           </div>
           <div className="readout-row">
             <span className="readout-label">cents</span>
-            <span className="readout-value">
+            <span className="readout-value v-cents">
               {detection
                 ? `${detection.cents > 0 ? '+' : ''}${detection.cents.toFixed(0)}`
                 : '—'}
@@ -477,11 +477,11 @@ export default function App() {
           </div>
           <div className="readout-row">
             <span className="readout-label">+ fifth</span>
-            <span className="readout-value">{fifthUp ?? '—'}</span>
+            <span className="readout-value v-fifth">{fifthUp ?? '—'}</span>
           </div>
           <div className="readout-row">
             <span className="readout-label">− fifth</span>
-            <span className="readout-value">{fifthDown ?? '—'}</span>
+            <span className="readout-value v-fifth">{fifthDown ?? '—'}</span>
           </div>
         </div>
 
