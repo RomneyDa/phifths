@@ -4,17 +4,19 @@ import {
   positionToPitchClass,
   signedFifthsBetweenPitchClasses,
 } from './notes';
+import { type Theme, contrastText } from './themes';
 
 type Props = {
   activePosition: number | null;
   cents: number | null;
   mode: LayoutMode;
+  theme: Theme;
   size?: number;
 };
 
 const SECTORS = 12;
 
-export function CircleOfFifths({ activePosition, cents, mode, size = 520 }: Props) {
+export function CircleOfFifths({ activePosition, cents, mode, theme, size = 520 }: Props) {
   const labels = labelsForMode(mode);
   const cx = size / 2;
   const cy = size / 2;
@@ -39,8 +41,8 @@ export function CircleOfFifths({ activePosition, cents, mode, size = 520 }: Prop
     >
       <defs>
         <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#1a1d2e" />
-          <stop offset="100%" stopColor="#0a0b14" />
+          <stop offset="0%" stopColor={theme.surface} />
+          <stop offset="100%" stopColor={theme.bg} />
         </radialGradient>
         <filter id="needleGlow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation={size * 0.006} result="blur" />
@@ -62,10 +64,22 @@ export function CircleOfFifths({ activePosition, cents, mode, size = 520 }: Prop
         const distance =
           activePc === null ? null : signedFifthsBetweenPitchClasses(activePc, positionPc);
         const isActive = distance === 0;
-
-        const fill = sectorFill(distance, isActive, mode);
-        const stroke = sectorStroke(distance, isActive, mode);
+        const noteColor = theme.noteColors[positionPc];
         const emphasizeFifth = shouldEmphasizeFifth(distance, mode);
+
+        const { fill, fillOpacity } = sectorFill({
+          isActive,
+          emphasizeFifth,
+          distance,
+          mode,
+          noteColor,
+          theme,
+        });
+        const stroke = isActive
+          ? theme.activeStroke
+          : emphasizeFifth
+            ? noteColor
+            : theme.sectorIdleStroke;
         const strokeWidth = isActive ? 3 : emphasizeFifth ? 2 : 1;
 
         const labelAngle = (a0 + a1) / 2;
@@ -76,17 +90,19 @@ export function CircleOfFifths({ activePosition, cents, mode, size = 520 }: Prop
         const fy = cy + Math.sin(labelAngle) * fifthsLabelR;
 
         const showDistance = distance !== null && distance !== 0;
+        const labelFill = isActive ? contrastText(noteColor) : theme.text;
 
         return (
           <g key={i}>
             <path
               d={path}
               fill={fill}
+              fillOpacity={fillOpacity}
               stroke={stroke}
               strokeWidth={strokeWidth}
               style={{
                 transition:
-                  'fill 180ms ease-out, stroke 180ms ease-out, stroke-width 180ms ease-out',
+                  'fill 180ms ease-out, fill-opacity 180ms ease-out, stroke 180ms ease-out, stroke-width 180ms ease-out',
               }}
             />
             <text
@@ -96,7 +112,7 @@ export function CircleOfFifths({ activePosition, cents, mode, size = 520 }: Prop
               dominantBaseline="middle"
               fontSize={size * 0.045}
               fontWeight={isActive ? 800 : 600}
-              fill={isActive ? '#0a0b14' : '#e6e8ff'}
+              fill={labelFill}
               style={{ pointerEvents: 'none', userSelect: 'none' }}
             >
               {label}
@@ -108,7 +124,7 @@ export function CircleOfFifths({ activePosition, cents, mode, size = 520 }: Prop
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fontSize={size * 0.025}
-                fill={emphasizeFifth ? '#7aa2ff' : '#9aa0c8'}
+                fill={emphasizeFifth ? noteColor : theme.textMuted}
                 fontWeight={emphasizeFifth ? 700 : 400}
                 style={{ pointerEvents: 'none', userSelect: 'none' }}
               >
@@ -119,7 +135,7 @@ export function CircleOfFifths({ activePosition, cents, mode, size = 520 }: Prop
         );
       })}
 
-      <circle cx={cx} cy={cy} r={innerR} fill="#0a0b14" stroke="#22263a" />
+      <circle cx={cx} cy={cy} r={innerR} fill={theme.bg} stroke={theme.border} />
 
       {activePosition !== null && cents !== null && (() => {
         const sectorCenter = startAngle + activePosition * sweep + sweep / 2;
@@ -136,7 +152,7 @@ export function CircleOfFifths({ activePosition, cents, mode, size = 520 }: Prop
             y1={y1}
             x2={x2}
             y2={y2}
-            stroke="#fff"
+            stroke={theme.needle}
             strokeWidth={size * 0.006}
             strokeLinecap="round"
             filter="url(#needleGlow)"
@@ -177,31 +193,22 @@ function sectorPath(
   ].join(' ');
 }
 
-function sectorFill(distance: number | null, isActive: boolean, mode: LayoutMode): string {
-  if (distance === null) return '#15182a';
-  if (isActive) return '#7aa2ff';
-
+function sectorFill(opts: {
+  isActive: boolean;
+  emphasizeFifth: boolean;
+  distance: number | null;
+  mode: LayoutMode;
+  noteColor: string;
+  theme: Theme;
+}): { fill: string; fillOpacity: number } {
+  const { isActive, emphasizeFifth, distance, mode, noteColor, theme } = opts;
+  if (distance === null) return { fill: theme.sectorIdle, fillOpacity: 1 };
+  if (isActive) return { fill: noteColor, fillOpacity: 1 };
+  if (emphasizeFifth) return { fill: noteColor, fillOpacity: 0.4 };
   if (mode === 'fifths') {
     const d = Math.abs(distance);
     const t = 1 - (d - 1) / 5;
-    const hue = 220 - t * 40;
-    const sat = 30 + t * 30;
-    const light = 18 + t * 22;
-    return `hsl(${hue} ${sat}% ${light}%)`;
+    return { fill: noteColor, fillOpacity: 0.08 + t * 0.22 };
   }
-
-  if (Math.abs(distance) === 1) return 'hsl(260 45% 38%)';
-  return '#15182a';
-}
-
-function sectorStroke(
-  distance: number | null,
-  isActive: boolean,
-  mode: LayoutMode,
-): string {
-  if (isActive) return '#fff';
-  if (mode === 'chromatic' && distance !== null && Math.abs(distance) === 1) {
-    return '#b58dff';
-  }
-  return '#22263a';
+  return { fill: theme.sectorIdle, fillOpacity: 1 };
 }

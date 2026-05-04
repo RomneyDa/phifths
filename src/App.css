@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  color: var(--text);
 }
 
 .brand {
@@ -12,7 +13,7 @@
   font-size: 22px;
   margin: 0;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #7aa2ff, #b58dff);
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -20,25 +21,43 @@
   pointer-events: none;
 }
 
-.gh {
+.corner-actions {
   position: absolute;
-  top: 14px;
-  right: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #9aa0c8;
+  top: 12px;
+  right: 14px;
+  display: flex;
+  gap: 6px;
+  z-index: 5;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
   text-decoration: none;
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  transition: color 200ms, transform 80ms;
-  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 200ms, transform 80ms, background 200ms;
+  padding: 0;
 }
 
-.gh:hover {
-  color: #e6e8ff;
+.icon-btn:hover {
+  color: var(--text);
+  background: var(--surface);
   transform: translateY(-1px);
+}
+
+.swatch {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
 }
 
 .main {
@@ -75,8 +94,8 @@
 
 .mode-toggle {
   display: inline-flex;
-  background: rgba(15, 18, 36, 0.9);
-  border: 1px solid #22263a;
+  background: var(--surface-blur);
+  border: 1px solid var(--border);
   border-radius: 999px;
   padding: 3px;
   gap: 2px;
@@ -86,7 +105,7 @@
 .mode-btn {
   background: transparent;
   border: none;
-  color: #9aa0c8;
+  color: var(--text-muted);
   font-size: 14px;
   font-weight: 600;
   padding: 8px 20px;
@@ -97,21 +116,25 @@
 }
 
 .mode-btn:hover {
-  color: #e6e8ff;
+  color: var(--text);
 }
 
 .mode-btn.on {
-  background: linear-gradient(135deg, rgba(122, 162, 255, 0.18), rgba(181, 141, 255, 0.18));
-  color: #e6e8ff;
-  box-shadow: inset 0 0 0 1px rgba(122, 162, 255, 0.4);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--brand-1) 22%, transparent),
+    color-mix(in srgb, var(--brand-2) 22%, transparent)
+  );
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand-1) 50%, transparent);
 }
 
 .readout {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
-  background: #0f1224;
-  border: 1px solid #22263a;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 10px 8px;
   width: min(540px, 92vw);
@@ -127,20 +150,20 @@
 }
 
 .readout-row + .readout-row {
-  border-left: 1px solid #1b1e30;
+  border-left: 1px solid var(--border);
 }
 
 .readout-label {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #6b7099;
+  color: var(--text-subtle);
 }
 
 .readout-value {
   font-size: 16px;
   font-weight: 600;
-  color: #e6e8ff;
+  color: var(--text);
   font-variant-numeric: tabular-nums;
   text-align: center;
   white-space: nowrap;
@@ -151,7 +174,7 @@
 
 .readout-value.note {
   font-size: 20px;
-  background: linear-gradient(135deg, #7aa2ff, #b58dff);
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -159,8 +182,8 @@
 
 .readout-value.note small {
   font-size: 12px;
-  color: #9aa0c8;
-  -webkit-text-fill-color: #9aa0c8;
+  color: var(--text-muted);
+  -webkit-text-fill-color: var(--text-muted);
   margin-left: 2px;
 }
 
@@ -177,32 +200,32 @@
 }
 
 .btn.start {
-  background: linear-gradient(135deg, #7aa2ff, #b58dff);
-  color: #0a0b14;
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+  color: var(--bg);
 }
 
 .btn.stop {
-  background: #22263a;
-  color: #e6e8ff;
-  border-color: #2f3454;
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
 }
 
 .btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(122, 162, 255, 0.2);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--brand-1) 25%, transparent);
 }
 
 .btn:focus-visible,
-.gh:focus-visible,
+.icon-btn:focus-visible,
 .mode-btn:focus-visible {
-  outline: 2px solid #7aa2ff;
+  outline: 2px solid var(--brand-1);
   outline-offset: 3px;
 }
 
 .error {
   color: #ff8a8a;
-  background: #2a1620;
-  border: 1px solid #5a2a3a;
+  background: color-mix(in srgb, #ff5577 18%, var(--surface));
+  border: 1px solid color-mix(in srgb, #ff5577 35%, var(--border));
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 13px;
@@ -247,8 +270,8 @@
     left: 14px;
     font-size: 19px;
   }
-  .gh {
+  .corner-actions {
     top: 10px;
-    right: 12px;
+    right: 10px;
   }
 }

@@ -10,6 +10,12 @@ import {
   midiToOctave,
   pitchClassToPosition,
 } from './notes';
+import {
+  DEFAULT_THEME_ID,
+  THEME_ORDER,
+  applyTheme,
+  themes,
+} from './themes';
 import './App.css';
 
 type DetectionState = {
@@ -31,9 +37,27 @@ export default function App() {
     return stored === 'fifths' || stored === 'chromatic' ? stored : 'chromatic';
   });
 
+  const [themeId, setThemeId] = useState<string>(() => {
+    const stored = typeof window !== 'undefined' && localStorage.getItem('phifths.theme');
+    return stored && stored in themes ? stored : DEFAULT_THEME_ID;
+  });
+  const theme = themes[themeId];
+
   useEffect(() => {
     localStorage.setItem('phifths.mode', mode);
   }, [mode]);
+
+  useEffect(() => {
+    applyTheme(theme);
+    localStorage.setItem('phifths.theme', themeId);
+  }, [theme, themeId]);
+
+  const cycleTheme = useCallback(() => {
+    setThemeId((prev) => {
+      const idx = THEME_ORDER.indexOf(prev as (typeof THEME_ORDER)[number]);
+      return THEME_ORDER[(idx + 1) % THEME_ORDER.length];
+    });
+  }, []);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -156,15 +180,26 @@ export default function App() {
   return (
     <div className="app">
       <h1 className="brand">phifths</h1>
-      <a
-        className="gh"
-        href="https://github.com/RomneyDa/phifths"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="View phifths on GitHub"
-      >
-        <GitHubIcon />
-      </a>
+      <div className="corner-actions">
+        <button
+          type="button"
+          className="icon-btn"
+          onClick={cycleTheme}
+          aria-label={`Theme: ${theme.label} (click to change)`}
+          title={`Theme: ${theme.label}`}
+        >
+          <ThemeSwatch colors={theme.noteColors} />
+        </button>
+        <a
+          className="icon-btn"
+          href="https://github.com/RomneyDa/phifths"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="View phifths on GitHub"
+        >
+          <GitHubIcon />
+        </a>
+      </div>
 
       <main className="main">
         <div className="circle-wrap">
@@ -172,6 +207,7 @@ export default function App() {
             activePosition={activePosition}
             cents={detection?.cents ?? null}
             mode={mode}
+            theme={theme}
           />
           <div className="hub">
             <div className="mode-toggle" role="radiogroup" aria-label="Layout mode">
@@ -239,6 +275,19 @@ export default function App() {
         {error && <div className="error">{error}</div>}
       </main>
     </div>
+  );
+}
+
+function ThemeSwatch({ colors }: { colors: readonly string[] }) {
+  const sweep = 360 / colors.length;
+  const slices = colors
+    .map((c, i) => `${c} ${i * sweep}deg ${(i + 1) * sweep}deg`)
+    .join(', ');
+  return (
+    <span
+      className="swatch"
+      style={{ background: `conic-gradient(from -90deg, ${slices})` }}
+    />
   );
 }
 
