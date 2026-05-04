@@ -87,9 +87,9 @@
   background: transparent;
   border: none;
   color: #9aa0c8;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
-  padding: 6px 14px;
+  padding: 8px 20px;
   border-radius: 999px;
   cursor: pointer;
   transition: background 160ms, color 160ms;
@@ -165,15 +165,15 @@
 }
 
 .btn {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  padding: 9px 22px;
+  padding: 12px 32px;
   border-radius: 999px;
   border: 1px solid transparent;
   cursor: pointer;
   transition: transform 80ms ease, box-shadow 200ms ease, border-color 200ms ease;
   letter-spacing: 0.02em;
-  min-width: 110px;
+  min-width: 140px;
 }
 
 .btn.start {
@@ -231,13 +231,13 @@
     font-size: 18px;
   }
   .mode-btn {
-    font-size: 11px;
-    padding: 5px 12px;
+    font-size: 13px;
+    padding: 7px 16px;
   }
   .btn {
-    font-size: 13px;
-    padding: 8px 18px;
-    min-width: 100px;
+    font-size: 15px;
+    padding: 10px 26px;
+    min-width: 130px;
   }
 }
 

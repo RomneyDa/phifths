@@ -26,7 +26,14 @@ export default function App() {
   const [listening, setListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [detection, setDetection] = useState<DetectionState | null>(null);
-  const [mode, setMode] = useState<LayoutMode>('chromatic');
+  const [mode, setMode] = useState<LayoutMode>(() => {
+    const stored = typeof window !== 'undefined' && localStorage.getItem('phifths.mode');
+    return stored === 'fifths' || stored === 'chromatic' ? stored : 'chromatic';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('phifths.mode', mode);
+  }, [mode]);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
