@@ -8,8 +8,10 @@ export type Theme = {
   text: string;
   textMuted: string;
   textSubtle: string;
-  brand1: string;
-  brand2: string;
+  brand: string;
+  brandText: string;
+  record: string;
+  recordText: string;
   needle: string;
   sectorIdle: string;
   sectorIdleStroke: string;
@@ -18,15 +20,8 @@ export type Theme = {
     string, string, string, string, string, string,
     string, string, string, string, string, string,
   ];
-  // Whether labels over an active note swatch should be light or dark.
-  // Auto-computed per-color when not specified.
-  noteContrast?: 'light' | 'dark';
 };
 
-// Scriabin's chromesthesia mapping. Pitch class index = chromatic semitone (C=0).
-// Going around the circle of fifths these form a smooth rainbow:
-// C → G → D → A → E → B → F♯ → C♯ → G♯ → D♯ → A♯ → F → C
-// red → orange → yellow → green → sky → pearly → bright blue → violet → purple → steel → rose → crimson
 const SCRIABIN: Theme['noteColors'] = [
   '#e83a3a', // C   — red
   '#7e3ad6', // C♯  — violet
@@ -43,8 +38,8 @@ const SCRIABIN: Theme['noteColors'] = [
 ];
 
 const MONOCHROME: Theme['noteColors'] = [
-  '#7aa2ff', '#7aa2ff', '#7aa2ff', '#7aa2ff', '#7aa2ff', '#7aa2ff',
-  '#7aa2ff', '#7aa2ff', '#7aa2ff', '#7aa2ff', '#7aa2ff', '#7aa2ff',
+  '#d9a484', '#d9a484', '#d9a484', '#d9a484', '#d9a484', '#d9a484',
+  '#d9a484', '#d9a484', '#d9a484', '#d9a484', '#d9a484', '#d9a484',
 ];
 
 export const themes: Record<string, Theme> = {
@@ -52,53 +47,59 @@ export const themes: Record<string, Theme> = {
     id: 'scriabin-dark',
     label: 'Scriabin',
     bg: '#0a0b14',
-    surface: '#0f1224',
-    surfaceBlur: 'rgba(15, 18, 36, 0.9)',
-    border: '#22263a',
+    surface: '#15182a',
+    surfaceBlur: 'rgba(21, 24, 42, 0.9)',
+    border: '#2a2f47',
     text: '#e6e8ff',
     textMuted: '#9aa0c8',
     textSubtle: '#6b7099',
-    brand1: '#7aa2ff',
-    brand2: '#b58dff',
+    brand: '#e8a87c',
+    brandText: '#1a1206',
+    record: '#d97a86',
+    recordText: '#1c0710',
     needle: '#ffffff',
     sectorIdle: '#15182a',
-    sectorIdleStroke: '#22263a',
+    sectorIdleStroke: '#2a2f47',
     activeStroke: '#ffffff',
     noteColors: SCRIABIN,
   },
   'scriabin-light': {
     id: 'scriabin-light',
     label: 'Light',
-    bg: '#f6f6fb',
+    bg: '#faf6f0',
     surface: '#ffffff',
-    surfaceBlur: 'rgba(255, 255, 255, 0.85)',
-    border: '#dde0eb',
-    text: '#1a1d2e',
-    textMuted: '#5b6079',
-    textSubtle: '#8a8fa8',
-    brand1: '#3f5fb8',
-    brand2: '#7e3ad6',
-    needle: '#1a1d2e',
-    sectorIdle: '#eceef5',
-    sectorIdleStroke: '#dde0eb',
-    activeStroke: '#1a1d2e',
+    surfaceBlur: 'rgba(255, 255, 255, 0.88)',
+    border: '#e6dfd2',
+    text: '#1f1c18',
+    textMuted: '#6b6357',
+    textSubtle: '#9c9489',
+    brand: '#b87a5c',
+    brandText: '#fdf6ee',
+    record: '#a85e6c',
+    recordText: '#fdf2f4',
+    needle: '#1f1c18',
+    sectorIdle: '#f0ebe0',
+    sectorIdleStroke: '#e6dfd2',
+    activeStroke: '#1f1c18',
     noteColors: SCRIABIN,
   },
   'mono-dark': {
     id: 'mono-dark',
     label: 'Mono',
     bg: '#0a0b14',
-    surface: '#0f1224',
-    surfaceBlur: 'rgba(15, 18, 36, 0.9)',
-    border: '#22263a',
+    surface: '#15182a',
+    surfaceBlur: 'rgba(21, 24, 42, 0.9)',
+    border: '#2a2f47',
     text: '#e6e8ff',
     textMuted: '#9aa0c8',
     textSubtle: '#6b7099',
-    brand1: '#7aa2ff',
-    brand2: '#b58dff',
+    brand: '#e8a87c',
+    brandText: '#1a1206',
+    record: '#d97a86',
+    recordText: '#1c0710',
     needle: '#ffffff',
     sectorIdle: '#15182a',
-    sectorIdleStroke: '#22263a',
+    sectorIdleStroke: '#2a2f47',
     activeStroke: '#ffffff',
     noteColors: MONOCHROME,
   },
@@ -106,21 +107,6 @@ export const themes: Record<string, Theme> = {
 
 export const THEME_ORDER = ['scriabin-dark', 'scriabin-light', 'mono-dark'] as const;
 export const DEFAULT_THEME_ID = 'scriabin-dark';
-
-const ROOT_VAR_KEYS: (keyof Theme)[] = [
-  'bg',
-  'surface',
-  'surfaceBlur',
-  'border',
-  'text',
-  'textMuted',
-  'textSubtle',
-  'brand1',
-  'brand2',
-  'needle',
-  'sectorIdle',
-  'sectorIdleStroke',
-];
 
 const VAR_NAME: Partial<Record<keyof Theme, string>> = {
   bg: '--bg',
@@ -130,8 +116,10 @@ const VAR_NAME: Partial<Record<keyof Theme, string>> = {
   text: '--text',
   textMuted: '--text-muted',
   textSubtle: '--text-subtle',
-  brand1: '--brand-1',
-  brand2: '--brand-2',
+  brand: '--brand',
+  brandText: '--brand-text',
+  record: '--record',
+  recordText: '--record-text',
   needle: '--needle',
   sectorIdle: '--sector-idle',
   sectorIdleStroke: '--sector-idle-stroke',
@@ -139,7 +127,7 @@ const VAR_NAME: Partial<Record<keyof Theme, string>> = {
 
 export function applyTheme(theme: Theme): void {
   const root = document.documentElement;
-  for (const key of ROOT_VAR_KEYS) {
+  for (const key of Object.keys(VAR_NAME) as (keyof Theme)[]) {
     const cssVar = VAR_NAME[key];
     if (!cssVar) continue;
     root.style.setProperty(cssVar, theme[key] as string);
@@ -147,7 +135,6 @@ export function applyTheme(theme: Theme): void {
   root.dataset.theme = theme.id;
 }
 
-// Pick a contrasting label color for an active sector, given its swatch color.
 export function contrastText(hex: string): string {
   const m = hex.match(/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
   if (!m) return '#0a0b14';
